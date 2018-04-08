@@ -7,7 +7,7 @@ This Python script uses the [Piazza API](https://github.com/hfaran/piazza-api)
 python module to poll a Piazza forum for new posts and automatically notifies a
 Slack channel when a new post is made so it can be quickly answered.
 
-Using this script [Xyene](https://github.com/hfaran/piazza-api) and I managed to
+Using this script [Xyene](https://github.com/Xyene) and I managed to
 bring down the average response time on the Piazza forum for the Winter 2018
 offering of CSC209 at the University of Toronto from just under an hour to 4
 minutes at one point.
