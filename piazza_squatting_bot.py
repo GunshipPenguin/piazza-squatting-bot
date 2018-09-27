@@ -14,13 +14,14 @@ class PiazzaClass:
     '''
     Represents a class on Piazza.
     '''
-    def __init__(self, name, network, subscribers, icon_emoji, bot_name):
+    def __init__(self, name, network, network_id, subscribers, icon_emoji, bot_name):
         '''(str, piazza_api.Network, list[str], str, str)
         Create a new Piazza Class with the given class name, network id, list
         of Slack handles to receive notifications, bot emoji and bot name.
         '''
         self.name = name
         self.network = network
+        self.network_id = network_id
         self.subscribers = subscribers
         self.icon_emoji = icon_emoji
         self.bot_name = bot_name
@@ -34,16 +35,13 @@ class PiazzaClass:
         requests.post(webhook_url, {'payload': json.dumps({
             'channel': '#general',
             'username': self.bot_name,
-            'text': 'New post in %s %s' % (self.name, ['@' + s for s in subscribers]),
+            'icon_emoji': self.icon_emoji,
+            'text': '%s New post in %s Piazza' % (' '.join(['<@%s>' % s for s in self.subscribers]), self.name),
             'attachments': [{
-                "fallback": 'New post in %s: %s' % (self.name, question_url),
                 "title": subject,
                 "title_link": question_url,
                 "text": body,
-                "mrkdwn_in": ["text"]
             }],
-            'icon_emoji': self.icon_emoji,
-            'link_names': True
         })})
 
 
@@ -72,7 +70,7 @@ def parse_class_configs(piazza):
 
     for config in yaml_config['class_configs']:
         network = piazza.network(config['network_id'])
-        classes.append(PiazzaClass(config['name'], network,
+        classes.append(PiazzaClass(config['name'], network, config['network_id'],
                 config['subscribers'], config['icon_emoji'], config['bot_name']))
 
 
@@ -123,8 +121,8 @@ def poll_classes():
         for cl in classes:
             # No latest post yet (bot has just started), set top post as latest
             if cl.last_notified_post is None:
-                latest_post = next(cl.network.iter_all_posts(limit=1))
-                cl.last_notified_post = latest_post['nr']
+                latest_post_in_class = next(cl.network.iter_all_posts(limit=1))
+                cl.last_notified_post = latest_post_in_class['nr']
                 continue
 
             # Grab all new posts
@@ -138,11 +136,13 @@ def poll_classes():
 
             # Send a notification for each one and update cl.last_notified_post
             for post in to_notify:
-                question_url = 'https://piazza.com/class/%s?cid=%s' % (network_id, nr)
+                question_url = 'https://piazza.com/class/%s?cid=%s' % (cl.network_id, post['nr'])
+
+                # 0xA0 = Non breaking space, found in Piazza HTML, must be converted to regular space
                 subject = convert_text(post['history'][0]['subject'].replace(
-                    u'\xa0', ' '), 'markdown', format='html')
+                    u'\xa0', ' '), 'plain', format='html')
                 body = convert_text(post['history'][0]['content'].replace(
-                    u'\xa0', ' '), 'markdown', format='html')
+                    u'\xa0', ' '), 'plain', format='html')
                 cl.notify(subject, question_url, body)
 
                 if cl.last_notified_post < post['nr']:
