@@ -31,10 +31,10 @@ class PiazzaClass:
 
     def notify(self, subject, question_url, body):
         '''
-        Notify's this classe's subscribers with the given subject, a link to the
-        given question url, and question body.
+        Notify's this classe's subscribers with the given subject, a link to
+        the given question url, and question body.
         '''
-        subscriber_mentions = ' '.join(['<@%s>' % s for s in self.subscribers]
+        subscriber_mentions = ' '.join(['<@%s>' % s for s in self.subscribers])
         requests.post(webhook_url, {'payload': json.dumps({
             'channel': '#general',
             'username': self.bot_name,
@@ -86,8 +86,8 @@ def parse_class_configs(piazza):
 
 def parse_global_config():
     '''
-    Parses and sets global (ie. not related to a particular class) configuration
-    data from config.yml
+    Parses and sets global (ie. not related to a particular class)
+    configuration data from config.yml
     '''
     yaml_config=get_config()
     global webhook_url
@@ -96,7 +96,8 @@ def parse_global_config():
 
 def try_login():
     '''
-    Tries to login to Piazza using the username/password specified in config.yml
+    Tries to login to Piazza using the username/password specified in
+    config.yml
     '''
     yaml_config=get_config()
 
@@ -126,8 +127,8 @@ def announce_online():
 
 def poll_classes():
     '''
-    Loops until program is terminated, polling Piazza periodically for new posts
-    and notifying all subscribers of that class.
+    Loops until program is terminated, polling Piazza periodically for new
+    posts and notifying all subscribers of that class.
     '''
     while True:
         for cl in classes:
@@ -174,7 +175,7 @@ try:
     poll_classes()
 except KeyboardInterrupt:
     sys.exit('Caught KeyboardInterrupt')
-except BaseException:
+except Exception:
     import traceback
     traceback.print_exc()
     print 'Unknown error occured'
