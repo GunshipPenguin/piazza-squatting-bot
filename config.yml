@@ -1,0 +1,27 @@
+# Configuration file for the Piazza Squatting Bot
+
+# Email/Password to log into Piazza with
+username: "somebody@mail.utoronto.ca"
+password: ""
+
+# Slack webhook URL to hit with notifications
+webhook_url: "https://hooks.slack.com/some_webhook"
+
+# Channel to post notifications in
+channel: "#general"
+
+# Class specific configurations, fill this list with all the classes you want
+# to monitor
+class_configs:
+  - name: "CS101" # Human readable class name that will be displayed in Slack
+    network_id: "network_id" # Piazza Network ID of class
+    icon_emoji: ":robot-face:" # Emoji Icon to use for this class's bot
+    bot_name: "CS101 Bot" # Name of this class's bot
+    subscribers: # List of Slack Member IDs to notify when a question is asked
+      - some_member_id
+  - name: "CS102"
+    network_id: "network_id"
+    icon_emoji: ":robot-face:"
+    bot_name: "CS102 Bot"
+    subscribers:
+      - some_member_id_1
